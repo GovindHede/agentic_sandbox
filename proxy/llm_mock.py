@@ -12,10 +12,11 @@ _env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=_env_path)
 
 # Ordered list of models to try — if one hits a rate limit, fall back to the next
+# Using newer models that have separate quota pools from the exhausted 2.0 tier
 FALLBACK_MODELS: List[str] = [
-    "gemini-2.0-flash",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
     "gemini-2.0-flash-lite",
-    "gemini-1.5-flash",
 ]
 
 # Retry configuration
