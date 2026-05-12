@@ -162,12 +162,20 @@ async def generate_mock_response(method: str, url: str, payload: str) -> str:
     for model_name in FALLBACK_MODELS:
         for attempt in range(1, MAX_RETRIES + 1):
             try:
-                response = await client.aio.models.generate_content(
-                    model=model_name,
-                    contents=prompt,
+                response = await asyncio.wait_for(
+                    client.aio.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                    ),
+                    timeout=8.0,  # Don't let Gemini hang longer than 8s
                 )
                 print(f"[MockLLM] Success with model={model_name} on attempt {attempt}")
                 return _clean_response(response.text)
+
+            except asyncio.TimeoutError:
+                print(f"[MockLLM] Timeout on {model_name} (attempt {attempt}). "
+                      f"Falling back to next model...")
+                break  # Skip retries, try next model immediately
 
             except Exception as e:
                 last_error = str(e)
