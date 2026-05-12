@@ -108,14 +108,14 @@ class SandboxManager:
             #   with SSL verification errors.
             # NOTE: Python's urllib on Linux reads LOWERCASE env vars (http_proxy),
             #   while requests/pip use UPPERCASE. We set BOTH for full compatibility.
-            #   no_proxy="" ensures nothing bypasses the proxy.
+            #   NO_PROXY prevents mitmproxy from intercepting pip package downloads.
             environment: Dict[str, str] = {
                 "HTTP_PROXY": PROXY_URL,
                 "HTTPS_PROXY": PROXY_URL,
                 "http_proxy": PROXY_URL,
                 "https_proxy": PROXY_URL,
-                "no_proxy": "",
-                "NO_PROXY": "",
+                "no_proxy": "pypi.org,files.pythonhosted.org,pypi.python.org",
+                "NO_PROXY": "pypi.org,files.pythonhosted.org,pypi.python.org",
                 "REQUESTS_CA_BUNDLE": CONTAINER_CERT_PATH,
                 "SSL_CERT_FILE": CONTAINER_CERT_PATH,
             }
@@ -124,7 +124,7 @@ class SandboxManager:
             # Using detach=True allows us to gracefully manage the timeout logic.
             container = self.client.containers.run(
                 image=self.image_name,
-                command=["/bin/sh", "-c", "pip install requests && python /app/script.py"],
+                command=["/bin/sh", "-c", "HTTP_PROXY='' HTTPS_PROXY='' http_proxy='' https_proxy='' REQUESTS_CA_BUNDLE='' SSL_CERT_FILE='' pip install requests && python /app/script.py"],
                 volumes=volumes,
                 environment=environment,
                 working_dir="/app",
