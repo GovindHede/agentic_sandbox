@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Dict, Any
 
-from container_manager import SandboxManager
+from core.container_manager import SandboxManager
 
 # Initialize the FastAPI application
 app = FastAPI(
