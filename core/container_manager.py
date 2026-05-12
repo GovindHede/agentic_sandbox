@@ -124,7 +124,7 @@ class SandboxManager:
             # Using detach=True allows us to gracefully manage the timeout logic.
             container = self.client.containers.run(
                 image=self.image_name,
-                command=["python", "/app/script.py"],
+                command=["/bin/sh", "-c", "pip install requests && python /app/script.py"],
                 volumes=volumes,
                 environment=environment,
                 working_dir="/app",
